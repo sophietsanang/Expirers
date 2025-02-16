@@ -1,4 +1,3 @@
 # Expirers
 
-Darien Moment
-Zaryaab Khan
+Group members: Darien Moment, Zaryaab Khan
