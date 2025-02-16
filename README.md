@@ -1,3 +1,3 @@
 # Expirers
 
-Group members: Darien Moment, Zaryaab Khan
+Group members: Darien Moment, Zaryaab Khan, Cianna Boayue
