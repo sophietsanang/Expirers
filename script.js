@@ -1,4 +1,3 @@
-// script.js
 
 document.addEventListener("DOMContentLoaded", () => {
     const navLinks = document.querySelectorAll("nav ul li a");
@@ -61,7 +60,7 @@ document.addEventListener("DOMContentLoaded", () => {
       return;
     }
   
-    // Fake breach check
+
     const breachCount = Math.floor(Math.random() * 10);
     // (Assume there's an element with id="breachInfo" to show this info if needed)
     // document.getElementById("breachInfo").textContent = `This email has been part of ${breachCount} breaches.`;

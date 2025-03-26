@@ -1,4 +1,4 @@
-/* Define CSS Variables for easy theming */
+
 :root {
     --primary-color: #ff595e;
     --secondary-color: #ff3b40;
@@ -160,12 +160,12 @@
     transform: translateY(-2px);
   }
   
-  /* Hidden Elements */
+  
   .hidden {
     display: none;
   }
   
-  /* Steps and FAQ Layout */
+
   .steps, .faq-container {
     text-align: left;
     margin: 0 auto;
@@ -193,25 +193,24 @@
     margin-top: 0;
   }
   
-  /* For modern browsers */
+
 input::placeholder {
-    font-family: 'Poppins', sans-serif; /* or your desired font */
-    color: #aaa; /* optional color */
-    font-size: 1rem; /* optional size */
+    font-family: 'Poppins', sans-serif; 
+    color: #aaa; 
+    font-size: 1rem; 
   }
   
-  /* For older versions of Internet Explorer */
   input:-ms-input-placeholder {
     font-family: 'Poppins', sans-serif;
   }
   
-  /* For Edge, older Safari (WebKit prefix) */
+ 
   input::-webkit-input-placeholder {
     font-family: 'Poppins', sans-serif;
   }
 
   button.primary-btn {
     font-family: 'Poppins', sans-serif;
-    /* other button styling */
+    
   }
   
