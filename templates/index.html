@@ -6,8 +6,8 @@
   <title>Expirer - Secure PDF Sharing</title>
 
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="styles.css">
-  <script defer src="script.js"></script>
+  <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+  <script defer src="{{ url_for('static', filename='script.js') }}"></script>
 </head>
 <body>
   <nav>
@@ -33,7 +33,10 @@
         <div class="form-group">
           <label for="email">Recipient Email</label>
           <input type="email" id="email" placeholder="Enter Email">
+          <button type="button" id="checkBreachBtn" class="secondary-btn">Check Breach</button>
         </div>
+
+        <div id="breachInfo"></div>
         
         <div class="form-group">
           <label for="expiration">Set Expiration</label>

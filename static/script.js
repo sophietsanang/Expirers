@@ -73,4 +73,34 @@ document.addEventListener("DOMContentLoaded", () => {
     // Show confirmation section (if implemented)
     // document.getElementById("confirmationSection").classList.remove("hidden");
   });
+
+
   
+  document.getElementById("email").addEventListener("blur", async function () {
+    const email = this.value.trim();
+    if (!email) return;
+
+    const url = `http://127.0.0.1:5000/check-breach?email=${encodeURIComponent(email)}`;
+
+    try {
+        const response = await fetch(url, { method: "GET" });
+
+        if (response.status === 200) {
+            const data = await response.json();
+            const breachInfo = document.getElementById("breachInfo");
+
+            if (data.found) {
+                breachInfo.textContent = `⚠️ This email has been found in ${data.sources.length} breaches.`;
+                breachInfo.style.color = "red";
+            } else {
+                breachInfo.textContent = "✅ This email is not found in any known breaches.";
+                breachInfo.style.color = "green";
+            }
+        } else {
+            alert("Error checking email. Please try again later.");
+        }
+    } catch (error) {
+        console.error("Error fetching breach data:", error);
+        alert("Failed to fetch breach data.");
+    }
+});
