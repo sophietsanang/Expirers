@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Secure PDF Viewer</title>
+</head>
+
+<script>
+    console.log("HERE VIEWER")
+    async function decryptAndDisplayPDF() {
+        let url = window.location.href;
+        if (!url.includes("#")) {
+            alert("Missing secret key!");
+            return;
+        }
+        
+
+        let [baseUrl, encodedKey] = url.split("#");
+        console.log("viewer baseUrl", baseUrl, "encodedKey", encodedKey);
+        let fileId = baseUrl.split("/").pop();
+        let secretKey = new Uint8Array(atob(encodedKey).split("").map(c => c.charCodeAt(0)));
+
+        // Fetch encrypted file
+        let response = await fetch(`/download/${fileId}`);
+        let data = await response.json();
+
+        if (data.error) {
+            alert("File not found!");
+            return;
+        }
+
+        let encryptedData = new Uint8Array(hexToBytes(data.encrypted_data));
+        let iv = new Uint8Array(hexToBytes(data.iv));
+        let salt = new Uint8Array(hexToBytes(data.salt));
+
+        // Derive AES key
+        let aesKey = await deriveAESKey(secretKey, salt);
+
+        // Decrypt file
+        let decryptedData = await decryptAESGCM(encryptedData, aesKey, iv);
+
+        // Convert decrypted data to Blob URL and display it
+        let blob = new Blob([decryptedData], { type: "application/pdf" });
+        let pdfUrl = URL.createObjectURL(blob);
+        document.getElementById("pdfViewer").src = pdfUrl;
+    }
+
+    function hexToBytes(hex) {
+        let bytes = [];
+        for (let i = 0; i < hex.length; i += 2) {
+            bytes.push(parseInt(hex.substr(i, 2), 16));
+        }
+        return bytes;
+    }
+
+    async function deriveAESKey(secretKey, salt) {
+        let keyMaterial = await window.crypto.subtle.importKey("raw", secretKey, { name: "HKDF" }, false, ["deriveKey"]);
+        return await window.crypto.subtle.deriveKey(
+            { name: "HKDF", salt: salt, info: new TextEncoder().encode("file-encryption"), hash: "SHA-256" },
+            keyMaterial,
+            { name: "AES-GCM", length: 256 },
+            false,
+            ["encrypt", "decrypt"]
+        );
+    }
+
+    async function decryptAESGCM(data, key, iv) {
+        return await window.crypto.subtle.decrypt({ name: "AES-GCM", iv: iv }, key, data);
+    }
+
+    window.onload = decryptAndDisplayPDF;
+</script>
+
+{% extends 'index.html' %}
+
+{% block body %}
+
+    <h1>Secure PDF Viewer</h1>
+    <iframe id="pdfViewer" width="100%" height="600px"></iframe>
+
+{% endblock %}
