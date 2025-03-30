@@ -7,9 +7,76 @@
 
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
-  <script defer src="{{ url_for('static', filename='script.js') }}"></script>
+  {% if 'view' not in request.path %}
+    <script defer src="{{ url_for('static', filename='script.js') }}"></script>
+  {% endif %}
 </head>
+
+<script>
+  async function encryptAndUpload() {
+      let fileInput = document.getElementById("fileInput").files[0];
+      if (!fileInput) {
+          alert("Select a file first!");
+          return;
+      }
+
+      // Generate random secret key & salt
+      let mainSecretKey = window.crypto.getRandomValues(new Uint8Array(32));
+      let salt = window.crypto.getRandomValues(new Uint8Array(16));
+
+      // Derive AES key using HKDF
+      let aesKey = await deriveAESKey(mainSecretKey, salt);
+
+      // Read the file as an ArrayBuffer
+      let fileBuffer = await fileInput.arrayBuffer();
+
+      // Encrypt file with AES-GCM
+      let iv = window.crypto.getRandomValues(new Uint8Array(12));
+      let encryptedData = await encryptAESGCM(fileBuffer, aesKey, iv);
+
+      // Convert to Base64 for URL embedding
+      let encodedKey = btoa(String.fromCharCode(...mainSecretKey));
+
+      // Upload encrypted file
+      let formData = new FormData();
+      formData.append("file", new Blob([encryptedData]));
+      formData.append("salt", new Blob([salt]));
+      formData.append("iv", new Blob([iv]));
+
+      let response = await fetch("/upload", { method: "POST", body: formData });
+      let data = await response.json();
+
+      if (data.share_url) {
+          document.getElementById("uploadMessage").innerHTML =
+              `✅ File uploaded! <br> Share this link: <a href="${data.share_url}#${encodedKey}">${data.share_url}#${encodedKey}</a>`;
+      }
+  }
+
+  // Derive AES key from Main Secret Key & Salt using HKDF
+  async function deriveAESKey(secretKey, salt) {
+      let keyMaterial = await window.crypto.subtle.importKey("raw", secretKey, { name: "HKDF" }, false, ["deriveKey"]);
+      return await window.crypto.subtle.deriveKey(
+          { name: "HKDF", salt: salt, info: new TextEncoder().encode("file-encryption"), hash: "SHA-256" },
+          keyMaterial,
+          { name: "AES-GCM", length: 256 },
+          false,
+          ["encrypt", "decrypt"]
+      );
+  }
+
+  async function decryptAESGCM(data, key, iv) {
+      return await window.crypto.subtle.decrypt({ name: "AES-GCM", iv: iv }, key, data);
+  }
+
+  // Encrypt data using AES-GCM
+  async function encryptAESGCM(data, key, iv) {
+      return await window.crypto.subtle.encrypt({ name: "AES-GCM", iv: iv }, key, data);
+  }
+
+</script>
+
 <body>
+  {% block body %}
   <nav>
     <div class="logo">Expirer</div>
     <ul>
@@ -44,7 +111,8 @@
           <input type="time" id="expirationTime">
         </div>
   
-        <button id="sendBtn" class="primary-btn">Send File</button>
+        <button id="sendBtn" class="primary-btn" onclick="encryptAndUpload()">Send File</button>
+        <p id="uploadMessage"></p>
       </section>
   
       <section id="how-to-use" class="content hidden">
@@ -77,5 +145,7 @@
       </section>
     </main>
   </div>
+
+  {% endblock %}
 </body>
 </html>
