@@ -20,24 +20,17 @@
           return;
       }
 
-      // Generate random secret key & salt
       let mainSecretKey = window.crypto.getRandomValues(new Uint8Array(32));
       let salt = window.crypto.getRandomValues(new Uint8Array(16));
 
-      // Derive AES key using HKDF
       let aesKey = await deriveAESKey(mainSecretKey, salt);
-
-      // Read the file as an ArrayBuffer
       let fileBuffer = await fileInput.arrayBuffer();
 
-      // Encrypt file with AES-GCM
       let iv = window.crypto.getRandomValues(new Uint8Array(12));
       let encryptedData = await encryptAESGCM(fileBuffer, aesKey, iv);
 
-      // Convert to Base64 for URL embedding
       let encodedKey = btoa(String.fromCharCode(...mainSecretKey));
 
-      // Upload encrypted file
       let formData = new FormData();
       formData.append("file", new Blob([encryptedData]));
       formData.append("salt", new Blob([salt]));
@@ -52,7 +45,6 @@
       }
   }
 
-  // Derive AES key from Main Secret Key & Salt using HKDF
   async function deriveAESKey(secretKey, salt) {
       let keyMaterial = await window.crypto.subtle.importKey("raw", secretKey, { name: "HKDF" }, false, ["deriveKey"]);
       return await window.crypto.subtle.deriveKey(
@@ -64,15 +56,42 @@
       );
   }
 
-  async function decryptAESGCM(data, key, iv) {
-      return await window.crypto.subtle.decrypt({ name: "AES-GCM", iv: iv }, key, data);
-  }
-
-  // Encrypt data using AES-GCM
   async function encryptAESGCM(data, key, iv) {
       return await window.crypto.subtle.encrypt({ name: "AES-GCM", iv: iv }, key, data);
   }
 
+  window.addEventListener("DOMContentLoaded", () => {
+    const uploadBox = document.getElementById("uploadBox");
+    const fileInput = document.getElementById("fileInput");
+    const fileNameDisplay = document.getElementById("fileNameDisplay");
+
+    fileInput.addEventListener("change", function () {
+      if (fileInput.files.length > 0) {
+        fileNameDisplay.textContent = `Selected file: ${fileInput.files[0].name}`;
+      }
+    });
+
+    uploadBox.addEventListener("dragover", function (e) {
+      e.preventDefault();
+      uploadBox.classList.add("drag-over");
+    });
+
+    uploadBox.addEventListener("dragleave", function () {
+      uploadBox.classList.remove("drag-over");
+    });
+
+    uploadBox.addEventListener("drop", function (e) {
+      e.preventDefault();
+      uploadBox.classList.remove("drag-over");
+      const files = e.dataTransfer.files;
+      if (files.length > 0 && files[0].type === "application/pdf") {
+        fileInput.files = files;
+        fileNameDisplay.textContent = `Selected file: ${files[0].name}`;
+      } else {
+        fileNameDisplay.textContent = `❌ Please drop a valid PDF file.`;
+      }
+    });
+  });
 </script>
 
 <body>
@@ -94,7 +113,8 @@
         
         <div class="upload-box" id="uploadBox">
           <input type="file" id="fileInput" accept="application/pdf">
-          <label for="fileInput">Drag &amp; drop your PDF or click to upload</label>
+          <label for="fileInput">Drag & drop your PDF or click to upload</label>
+          <p id="fileNameDisplay" style="margin-top: 10px; font-weight: 500;"></p>
         </div>
         
         <div class="form-group">
@@ -137,10 +157,6 @@
             <h3>How long will my file be available?</h3>
             <p>Your file will be accessible until the expiration date you set.</p>
           </div>
-          <!-- <div class="faq-item">
-            <h3>Is my data secure?</h3>
-            <p>Yes, your PDFs are secured and only accessible via the generated link.</p>
-          </div> -->
         </div>
       </section>
     </main>
