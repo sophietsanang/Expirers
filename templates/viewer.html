@@ -7,7 +7,6 @@
 </head>
 
 <script>
-    console.log("HERE VIEWER")
     async function decryptAndDisplayPDF() {
         let url = window.location.href;
         if (!url.includes("#")) {
@@ -15,7 +14,6 @@
             return;
         }
         
-
         let [baseUrl, encodedKey] = url.split("#");
         console.log("viewer baseUrl", baseUrl, "encodedKey", encodedKey);
         let fileId = baseUrl.split("/").pop();
@@ -77,6 +75,6 @@
 {% block body %}
 
     <h1>Secure PDF Viewer</h1>
-    <iframe id="pdfViewer" width="100%" height="600px"></iframe>
+    <iframe id="pdfViewer" width="100%" height="1000px"></iframe>
 
 {% endblock %}

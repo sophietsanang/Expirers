@@ -51,17 +51,15 @@ def check_breach():
     except Exception as e:
         return jsonify({"error": f"An error occurred: {str(e)}"}), 500
 
-# 🚀 **Upload & Store Encrypted PDF**
+# Upload & Store Encrypted PDF
 @app.route("/upload", methods=["POST"])
 def upload_file():
     file = request.files["file"].read()
     salt = request.files["salt"].read()
     iv = request.files["iv"].read()
 
-    # Generate unique file ID
     file_id = os.urandom(12).hex()
 
-    # Store in database
     conn = sqlite3.connect(DATABASE)
     cursor = conn.cursor()
     cursor.execute("INSERT INTO files (file_id, encrypted_data, iv, salt) VALUES (?, ?, ?, ?)",
@@ -69,11 +67,10 @@ def upload_file():
     conn.commit()
     conn.close()
 
-    # Generate Shareable URL (Key in Fragment)
     share_url = f"http://127.0.0.1:5000/view/{file_id}"
     return jsonify({"message": "File uploaded & encrypted!", "share_url": share_url})
 
-# 🚀 **Download & Return Encrypted PDF**
+# Download & Return Encrypted PDF
 @app.route("/download/<file_id>", methods=["GET"])
 def download_file(file_id):
     conn = sqlite3.connect(DATABASE)
@@ -95,14 +92,13 @@ def download_file(file_id):
 
 @app.route("/view/<file_id>", methods=['GET'])
 def view_pdf(file_id):
-    print(f"Accessing /view/{file_id}")  # Debugging line
-    # Check if the file exists in the database
     conn = sqlite3.connect(DATABASE)
     cursor = conn.cursor()
     cursor.execute("SELECT * FROM files WHERE file_id = ?", (file_id,))
     file_data = cursor.fetchone()
     conn.close()
 
+    #Use expiration function here?
     if not file_data:
         return jsonify({"error": "File not found"}), 404
 
