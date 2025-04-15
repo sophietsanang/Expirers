@@ -1,18 +1,21 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Expirer - Secure PDF Sharing</title>
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Expirer - Secure PDF Sharing</title>
 
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
-  {% if 'view' not in request.path %}
+    <link
+      href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap"
+      rel="stylesheet">
+    <link rel="stylesheet"
+      href="{{ url_for('static', filename='styles.css') }}">
+    {% if 'view' not in request.path %}
     <script defer src="{{ url_for('static', filename='script.js') }}"></script>
-  {% endif %}
-</head>
+    {% endif %}
+  </head>
 
-<script>
+  <script>
   async function encryptAndUpload() {
       let fileInput = document.getElementById("fileInput").files[0];
       if (!fileInput) {
@@ -35,6 +38,19 @@
       formData.append("file", new Blob([encryptedData]));
       formData.append("salt", new Blob([salt]));
       formData.append("iv", new Blob([iv]));
+
+      let dateInput = document.getElementById("expirationDate").value;
+      let timeInput = document.getElementById("expirationTime").value;
+
+    if (!dateInput || !timeInput) {
+        alert("Please select both expiration date and time.");
+        return;
+    }
+
+// Combine date + time and convert to ISO 8601
+      let expirationDatetime = new Date(`${dateInput}T${timeInput}`);
+      formData.append("expiration", expirationDatetime.toISOString());
+
 
       let response = await fetch("/upload", { method: "POST", body: formData });
       let data = await response.json();
@@ -94,74 +110,81 @@
   });
 </script>
 
-<body>
-  {% block body %}
-  <nav>
-    <div class="logo">Expirer</div>
-    <ul>
-      <li><a href="#home" data-section="home">Home</a></li>
-      <li><a href="#how-to-use" data-section="how-to-use">How to Use</a></li>
-      <li><a href="#faq" data-section="faq">FAQ</a></li>
-    </ul>
-  </nav>
-  
-  <div class="container">
-    <main>
-      <section id="home" class="content active">
-        <h1>Welcome to Expirer!</h1>
-        <p>Upload and share your PDFs securely with custom expiration settings.</p>
-        
-        <div class="upload-box" id="uploadBox">
-          <input type="file" id="fileInput" accept="application/pdf">
-          <label for="fileInput">Drag & drop your PDF or click to upload</label>
-          <p id="fileNameDisplay" style="margin-top: 10px; font-weight: 500;"></p>
-        </div>
-        
-        <div class="form-group">
-          <label for="email">Recipient Email</label>
-          <input type="email" id="email" placeholder="Enter Email">
-          <button type="button" id="checkBreachBtn" class="secondary-btn">Check Breach</button>
-        </div>
+  <body>
+    {% block body %}
+    <nav>
+      <div class="logo">Expirer</div>
+      <ul>
+        <li><a href="#home" data-section="home">Home</a></li>
+        <li><a href="#how-to-use" data-section="how-to-use">How to Use</a></li>
+        <li><a href="#faq" data-section="faq">FAQ</a></li>
+      </ul>
+    </nav>
 
-        <div id="breachInfo"></div>
-        
-        <div class="form-group">
-          <label for="expiration">Set Expiration</label>
-          <input type="date" id="expirationDate">
-          <input type="time" id="expirationTime">
-        </div>
-  
-        <button id="sendBtn" class="primary-btn" onclick="encryptAndUpload()">Send File</button>
-        <p id="uploadMessage"></p>
-      </section>
-  
-      <section id="how-to-use" class="content hidden">
-        <h1>How to Use Expirer</h1>
-        <ol class="steps">
-          <li>Upload your PDF using the file upload box.</li>
-          <li>Enter the recipient’s email.</li>
-          <li>Set an expiration date and time.</li>
-          <li>Click <em>Send File</em> to share securely.</li>
-          <li>Copy the generated link and share it.</li>
-        </ol>
-      </section>
-  
-      <section id="faq" class="content hidden">
-        <h1>Frequently Asked Questions</h1>
-        <div class="faq-container">
-          <div class="faq-item">
-            <h3>What is Expirer?</h3>
-            <p>Expirer is a platform for uploading and sharing PDFs with expiration settings.</p>
-          </div>
-          <div class="faq-item">
-            <h3>How long will my file be available?</h3>
-            <p>Your file will be accessible until the expiration date you set.</p>
-          </div>
-        </div>
-      </section>
-    </main>
-  </div>
+    <div class="container">
+      <main>
+        <section id="home" class="content active">
+          <h1>Welcome to Expirer!</h1>
+          <p>Upload and share your PDFs securely with custom expiration
+            settings.</p>
 
-  {% endblock %}
-</body>
+          <div class="upload-box" id="uploadBox">
+            <input type="file" id="fileInput" accept="application/pdf">
+            <label for="fileInput">Drag & drop your PDF or click to
+              upload</label>
+            <p id="fileNameDisplay"
+              style="margin-top: 10px; font-weight: 500;"></p>
+          </div>
+
+          <div class="form-group">
+            <label for="email">Recipient Email</label>
+            <input type="email" id="email" placeholder="Enter Email">
+            <button type="button" id="checkBreachBtn"
+              class="secondary-btn">Check Breach</button>
+          </div>
+
+          <div id="breachInfo"></div>
+
+          <div class="form-group">
+            <label for="expiration">Set Expiration</label>
+            <input type="date" id="expirationDate">
+            <input type="time" id="expirationTime">
+          </div>
+
+          <button id="sendBtn" class="primary-btn"
+            onclick="encryptAndUpload()">Send File</button>
+          <p id="uploadMessage"></p>
+        </section>
+
+        <section id="how-to-use" class="content hidden">
+          <h1>How to Use Expirer</h1>
+          <ol class="steps">
+            <li>Upload your PDF using the file upload box.</li>
+            <li>Enter the recipient’s email.</li>
+            <li>Set an expiration date and time.</li>
+            <li>Click <em>Send File</em> to share securely.</li>
+            <li>Copy the generated link and share it.</li>
+          </ol>
+        </section>
+
+        <section id="faq" class="content hidden">
+          <h1>Frequently Asked Questions</h1>
+          <div class="faq-container">
+            <div class="faq-item">
+              <h3>What is Expirer?</h3>
+              <p>Expirer is a platform for uploading and sharing PDFs with
+                expiration settings.</p>
+            </div>
+            <div class="faq-item">
+              <h3>How long will my file be available?</h3>
+              <p>Your file will be accessible until the expiration date you
+                set.</p>
+            </div>
+          </div>
+        </section>
+      </main>
+    </div>
+
+    {% endblock %}
+  </body>
 </html>

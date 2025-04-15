@@ -5,6 +5,8 @@ import requests
 import firebase_admin
 from firebase_admin import credentials
 from firebase_admin import firestore
+from datetime import datetime, timezone
+from dateutil.parser import isoparse
 
 app = Flask(__name__, static_folder="static", template_folder="templates")
 
@@ -44,44 +46,63 @@ def upload_file():
     salt = request.files["salt"].read()
     iv = request.files["iv"].read()
     file_id = os.urandom(12).hex()
+    expiration_str = request.form["expiration"]
+
+    expiration_time = isoparse(expiration_str)
 
     doc_ref = db.collection("documents").document(file_id)
-    doc_ref.set({"file": file, "salt": salt, "iv": iv})
+    doc_ref.set({"file": file, "salt": salt, "iv": iv, "expiration": expiration_time.isoformat()})
+    # doc_ref.set({"file": file, "salt": salt, "iv": iv})
 
     share_url = f"http://127.0.0.1:5000/view/{file_id}"
     return jsonify({"message": "File uploaded & encrypted!", "share_url": share_url})
 
-# Download & Return Encrypted PDF
+
+
 @app.route("/download/<file_id>", methods=["GET"])
 def download_file(file_id):
     doc_ref = db.collection("documents").document(file_id)
-
     doc = doc_ref.get()
-    print(type(doc))
-    if doc.exists:
-        print(f"Document data: {doc.to_dict()}")
-    else:
-        print("No such document!")
 
-    temp_dict = doc.to_dict()
+    if not doc.exists:
+        return jsonify({"error": "File not found"}), 404
 
-    encrypted_data, iv, salt = temp_dict["file"], temp_dict["iv"], temp_dict["salt"]
+    data = doc.to_dict()
+    if is_file_expired(data["expiration"]):
+        return jsonify({"error": "File link has expired"}), 403
 
     return {
-        "encrypted_data": encrypted_data.hex(),
-        "iv": iv.hex(),
-        "salt": salt.hex()
+        "encrypted_data": data["file"].hex(),
+        "iv": data["iv"].hex(),
+        "salt": data["salt"].hex()
     }
+
+# Checks the file expiration date and time
+def is_file_expired(expiration_str):
+    try:
+        expiration_time = isoparse(expiration_str)
+        return datetime.now(timezone.utc) > expiration_time
+    except Exception as e:
+        print(f"Error parsing expiration time: {e}")
+        return False
+
 
 @app.route("/view/<file_id>", methods=['GET'])
 def view_pdf(file_id):
     doc_ref = db.collection("documents").document(file_id)
+    doc = doc_ref.get()
 
-    #Use expiration function here?
-    if not doc_ref:
+    if not doc.exists:
         return jsonify({"error": "File not found"}), 404
 
+    data = doc.to_dict()
+    if is_file_expired(data["expiration"]):
+        return render_template("expired.html"), 403
+
     return render_template("viewer.html", file_id=file_id), 200
+
+
+
 
 
 if __name__ == '__main__':

@@ -59,6 +59,7 @@ document.addEventListener("DOMContentLoaded", () => {
       alert("Please fill out all fields and upload a file.");
       return;
     }
+
   
 
     const breachCount = Math.floor(Math.random() * 10);
@@ -72,6 +73,15 @@ document.addEventListener("DOMContentLoaded", () => {
   
     // Show confirmation section (if implemented)
     // document.getElementById("confirmationSection").classList.remove("hidden");
+
+    //NEW STUFF
+    const formData = new FormData();
+    formData.append("email", email);
+    formData.append("expiration", expirationDatetime);  // Add expiration datetime to form data
+    formData.append("file", fileInput.files[0]);  // Attach the file
+
+
+ 
   });
 
 
