@@ -2,29 +2,15 @@ from flask import Flask, request, jsonify, send_from_directory, render_template
 import sqlite3
 import os
 import requests
+import firebase_admin
+from firebase_admin import credentials
+from firebase_admin import firestore
 
 app = Flask(__name__, static_folder="static", template_folder="templates")
 
-DATABASE = "expirer.db"
-
-# Initialize Database
-
-def init_db():
-    conn = sqlite3.connect(DATABASE)
-    cursor = conn.cursor()
-    cursor.execute("""
-        CREATE TABLE IF NOT EXISTS files (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            file_id TEXT UNIQUE,
-            encrypted_data BLOB,
-            iv BLOB,
-            salt BLOB
-        )
-    """)
-    conn.commit()
-    conn.close()
-
-init_db()
+cred = credentials.Certificate("bus-expirer-firebase-adminsdk-fbsvc-7bbbc2b9f1.json")
+firebase_admin.initialize_app(cred)
+db = firestore.client()
 
 @app.route('/')
 def serve_index():
@@ -57,15 +43,10 @@ def upload_file():
     file = request.files["file"].read()
     salt = request.files["salt"].read()
     iv = request.files["iv"].read()
-
     file_id = os.urandom(12).hex()
 
-    conn = sqlite3.connect(DATABASE)
-    cursor = conn.cursor()
-    cursor.execute("INSERT INTO files (file_id, encrypted_data, iv, salt) VALUES (?, ?, ?, ?)",
-                   (file_id, file, iv, salt))
-    conn.commit()
-    conn.close()
+    doc_ref = db.collection("documents").document(file_id)
+    doc_ref.set({"file": file, "salt": salt, "iv": iv})
 
     share_url = f"http://127.0.0.1:5000/view/{file_id}"
     return jsonify({"message": "File uploaded & encrypted!", "share_url": share_url})
@@ -73,16 +54,18 @@ def upload_file():
 # Download & Return Encrypted PDF
 @app.route("/download/<file_id>", methods=["GET"])
 def download_file(file_id):
-    conn = sqlite3.connect(DATABASE)
-    cursor = conn.cursor()
-    cursor.execute("SELECT encrypted_data, iv, salt FROM files WHERE file_id = ?", (file_id,))
-    row = cursor.fetchone()
-    conn.close()
+    doc_ref = db.collection("documents").document(file_id)
 
-    if not row:
-        return jsonify({"error": "File not found"}), 404
+    doc = doc_ref.get()
+    print(type(doc))
+    if doc.exists:
+        print(f"Document data: {doc.to_dict()}")
+    else:
+        print("No such document!")
 
-    encrypted_data, iv, salt = row
+    temp_dict = doc.to_dict()
+
+    encrypted_data, iv, salt = temp_dict["file"], temp_dict["iv"], temp_dict["salt"]
 
     return {
         "encrypted_data": encrypted_data.hex(),
@@ -92,14 +75,10 @@ def download_file(file_id):
 
 @app.route("/view/<file_id>", methods=['GET'])
 def view_pdf(file_id):
-    conn = sqlite3.connect(DATABASE)
-    cursor = conn.cursor()
-    cursor.execute("SELECT * FROM files WHERE file_id = ?", (file_id,))
-    file_data = cursor.fetchone()
-    conn.close()
+    doc_ref = db.collection("documents").document(file_id)
 
     #Use expiration function here?
-    if not file_data:
+    if not doc_ref:
         return jsonify({"error": "File not found"}), 404
 
     return render_template("viewer.html", file_id=file_id), 200
