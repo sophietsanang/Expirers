@@ -8,7 +8,7 @@ from firebase_admin import firestore
 
 app = Flask(__name__, static_folder="static", template_folder="templates")
 
-cred = credentials.Certificate("bus-expirer-firebase-adminsdk-fbsvc-7bbbc2b9f1.json")
+cred = credentials.Certificate("bus-expirer-firebase-adminsdk-fbsvc-b1a5218fad.json")
 firebase_admin.initialize_app(cred)
 db = firestore.client()
 
