@@ -84,11 +84,35 @@ document.addEventListener("DOMContentLoaded", () => {
  
   });
 
+  
+  const emailInput = document.getElementById("email");
+  const checkBreachBtn = document.getElementById("checkBreachBtn");
+
+  emailInput.addEventListener("input", function () {
+    const email = this.value.trim();
+    const isValidEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+
+    if (isValidEmail) {
+        checkBreachBtn.classList.add("valid-email");
+        checkBreachBtn.disabled = false;
+    } else {
+        checkBreachBtn.classList.remove("valid-email");
+        checkBreachBtn.disabled = true;
+    }
+});
 
   
   document.getElementById("email").addEventListener("blur", async function () {
     const email = this.value.trim();
-    if (!email) return;
+    const breachInfo = document.getElementById("breachInfo");
+
+    // Simple email validation regex
+    const isValidEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+    if (!email || !isValidEmail) {
+        breachInfo.textContent = "❗ Please enter a valid email address.";
+        breachInfo.style.color = "orange";
+        return;
+    }
 
     const url = `http://127.0.0.1:5000/check-breach?email=${encodeURIComponent(email)}`;
 
@@ -97,7 +121,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
         if (response.status === 200) {
             const data = await response.json();
-            const breachInfo = document.getElementById("breachInfo");
 
             if (data.found) {
                 breachInfo.textContent = `⚠️ This email has been found in ${data.sources.length} breaches.`;
