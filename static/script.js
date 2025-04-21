@@ -48,41 +48,7 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   });
   
-  // Existing send file functionality
-  document.getElementById("sendBtn").addEventListener("click", function() {
-    const email = document.getElementById("email").value;
-    const expirationDate = document.getElementById("expirationDate").value;
-    const expirationTime = document.getElementById("expirationTime").value;
-    const fileInput = document.getElementById("fileInput");
   
-    if (!email || !expirationDate || !expirationTime || fileInput.files.length === 0) {
-      alert("Please fill out all fields and upload a file.");
-      return;
-    }
-
-  
-
-    const breachCount = Math.floor(Math.random() * 10);
-    // (Assume there's an element with id="breachInfo" to show this info if needed)
-    // document.getElementById("breachInfo").textContent = `This email has been part of ${breachCount} breaches.`;
-  
-    // Generate fake link
-    const fakeLink = "https://expirer.com/download?id=" + Math.random().toString(36).substr(2, 9);
-    // (Assume there's an element with id="pdfLink" to show the link if needed)
-    // document.getElementById("pdfLink").value = fakeLink;
-  
-    // Show confirmation section (if implemented)
-    // document.getElementById("confirmationSection").classList.remove("hidden");
-
-    //NEW STUFF
-    const formData = new FormData();
-    formData.append("email", email);
-    formData.append("expiration", expirationDatetime);  // Add expiration datetime to form data
-    formData.append("file", fileInput.files[0]);  // Attach the file
-
-
- 
-  });
 
   
   const emailInput = document.getElementById("email");
@@ -102,8 +68,8 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 
   
-  document.getElementById("email").addEventListener("blur", async function () {
-    const email = this.value.trim();
+  document.getElementById("checkBreachBtn").addEventListener("click", async function () {
+    const email = document.getElementById("email").value.trim();
     const breachInfo = document.getElementById("breachInfo");
 
     // Simple email validation regex
