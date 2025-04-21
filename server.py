@@ -9,6 +9,8 @@ from datetime import datetime, timezone
 from dateutil.parser import isoparse
 import sendgrid
 from sendgrid.helpers.mail import Mail, Email, To, Content, TrackingSettings, ClickTracking
+from dotenv import load_dotenv
+load_dotenv()
 
 
 app = Flask(__name__, static_folder="static", template_folder="templates")
