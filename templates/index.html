@@ -41,9 +41,10 @@
 
       let dateInput = document.getElementById("expirationDate").value;
       let timeInput = document.getElementById("expirationTime").value;
+      let email = document.getElementById("email").value.trim();
 
-    if (!dateInput || !timeInput) {
-        alert("Please select both expiration date and time.");
+    if (!dateInput || !timeInput || !email) {
+        alert("Please fill out all fields");
         return;
     }
 
@@ -51,14 +52,47 @@
       let expirationDatetime = new Date(`${dateInput}T${timeInput}`);
       formData.append("expiration", expirationDatetime.toISOString());
 
+      try {
+        // Step 1: Upload encrypted file
+        const response = await fetch("/upload", { method: "POST", body: formData });
+        const data = await response.json();
 
-      let response = await fetch("/upload", { method: "POST", body: formData });
-      let data = await response.json();
+        if (!data.share_url) {
+            alert("Something went wrong with the upload.");
+            return;
+        }
 
-      if (data.share_url) {
-          document.getElementById("uploadMessage").innerHTML =
-              `✅ File uploaded! <br> Share this link: <a href="${data.share_url}#${encodedKey}">${data.share_url}#${encodedKey}</a>`;
-      }
+        const shareUrl = `${data.share_url}#${encodedKey}`;
+
+        // Step 2: Send email with the share URL
+        const emailResponse = await fetch("/send-email", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+                email: email,
+                share_url: shareUrl
+            })
+        });
+
+        const emailResult = await emailResponse.json();
+
+        if (emailResponse.ok) {
+            document.getElementById("uploadMessage").innerHTML =
+                `✅ File uploaded and email sent!<br>`;
+        } else {
+            document.getElementById("uploadMessage").innerHTML =
+                `⚠️ File uploaded but failed to send email: ${emailResult.error}<br> Link: <a href="${shareUrl}">${shareUrl}</a>`;
+        }
+
+    } catch (err) {
+        console.error("Upload or email error:", err);
+        alert("Something went wrong. Please try again.");
+    }
+
+
+      
   }
 
   async function deriveAESKey(secretKey, salt) {

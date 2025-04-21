@@ -7,6 +7,9 @@ from firebase_admin import credentials
 from firebase_admin import firestore
 from datetime import datetime, timezone
 from dateutil.parser import isoparse
+import sendgrid
+from sendgrid.helpers.mail import Mail, Email, To, Content, TrackingSettings, ClickTracking
+
 
 app = Flask(__name__, static_folder="static", template_folder="templates")
 
@@ -57,6 +60,40 @@ def upload_file():
     share_url = f"http://127.0.0.1:5000/view/{file_id}"
     return jsonify({"message": "File uploaded & encrypted!", "share_url": share_url})
 
+@app.route("/send-email", methods=["POST"])
+def send_email():
+    data = request.get_json()
+    recipient_email = data.get("email")
+    share_url = data.get("share_url")
+
+    if not recipient_email or not share_url:
+        return jsonify({"error": "Missing recipient email or share URL"}), 400
+
+    try:
+        sg = sendgrid.SendGridAPIClient(api_key=os.environ.get("SENDGRID_API_KEY"))
+        from_email = Email("sendwithexpirer@gmail.com")
+        to_email = To(recipient_email)
+        subject = "You've received a secure file via Expirer"
+        content = Content(
+            "text/plain",
+            f"Hello,\n\nYou've been sent a secure file through Expirer. Click the link below to view it:\n\n{share_url}\n\nPlease note: This link will expire after the set time."
+        )
+
+        mail = Mail(from_email, to_email, subject, content)
+
+        # 🔧 Disable click tracking to preserve your exact link
+        tracking_settings = TrackingSettings()
+        tracking_settings.click_tracking = ClickTracking(enable=False, enable_text=False)
+        mail.tracking_settings = tracking_settings
+
+        response = sg.send(mail)
+
+        if response.status_code in [200, 202]:
+            return jsonify({"message": "Email sent successfully!"})
+        else:
+            return jsonify({"error": "Failed to send email."}), 500
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
 
 
 @app.route("/download/<file_id>", methods=["GET"])
