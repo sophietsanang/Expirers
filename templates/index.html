@@ -165,7 +165,7 @@
           <div class="upload-box" id="uploadBox">
             <input type="file" id="fileInput" accept="application/pdf">
             <label for="fileInput">Drag & drop your PDF or click to
-              upload</label>
+              upload <span class="required-indicator">*</span>  </label>
             <p id="fileNameDisplay"
               style="margin-top: 10px; font-weight: 500;"></p>
           </div>
@@ -175,6 +175,7 @@
               Recipient Email
               <span class="tooltip-wrapper">
                 <span class="tooltip-icon">ℹ️</span>
+                <span class="required-indicator">*</span>
                 <span class="tooltip-text">
                   Note: It’s not unusual for an email to appear in multiple data breaches. According to the website Have I Been Pwned — a tool that tracks whether your email has been exposed in known data leaks — many people find their addresses in 5–10 breaches. This doesn’t necessarily mean the person is unsafe; it just shows how common large-scale breaches have become over time. Always use good judgment when sharing sensitive files.
                 </span>
@@ -187,7 +188,7 @@
           <div id="breachInfo"></div>
 
           <div class="form-group">
-            <label for="expiration">Set Expiration</label>
+            <label for="expiration">Set Expiration <span class="required-indicator">*</span> </label>
             <input type="date" id="expirationDate">
             <input type="time" id="expirationTime">
           </div>

@@ -273,8 +273,8 @@ input::placeholder {
     position: absolute;
     z-index: 1;
   
-    top: 50%; /* Center vertically next to icon */
-    left: 120%; /* Move to the right of the icon */
+    top: 50%; 
+    left: 120%; 
     transform: translateY(-50%); 
     
     opacity: 0;
@@ -287,6 +287,12 @@ input::placeholder {
   .tooltip-wrapper:hover .tooltip-text {
     visibility: visible;
     opacity: 1;
+  }
+
+  .required-indicator {
+    color: red;
+    font-size: 0.85em;
+    margin-left: 4px;
   }
   
   
