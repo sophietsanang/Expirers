@@ -1,5 +1,4 @@
-from flask import Flask, request, jsonify, send_from_directory, render_template
-import sqlite3
+from flask import Flask, request, jsonify, render_template, redirect, url_for
 import os
 import requests
 import firebase_admin
@@ -9,8 +8,11 @@ from datetime import datetime, timezone
 from dateutil.parser import isoparse
 import sendgrid
 from sendgrid.helpers.mail import Mail, Email, To, Content, TrackingSettings, ClickTracking
+import random
+import string
 from dotenv import load_dotenv
 load_dotenv()
+
 
 
 app = Flask(__name__, static_folder="static", template_folder="templates")
@@ -18,6 +20,9 @@ app = Flask(__name__, static_folder="static", template_folder="templates")
 cred = credentials.Certificate("bus-expirer-firebase-adminsdk-fbsvc-34c2895d64.json")
 firebase_admin.initialize_app(cred)
 db = firestore.client()
+
+def generate_short_code(length=6):
+    return ''.join(random.choices(string.ascii_letters + string.digits, k=length))
 
 @app.route('/')
 def serve_index():
@@ -52,14 +57,25 @@ def upload_file():
     iv = request.files["iv"].read()
     file_id = os.urandom(12).hex()
     expiration_str = request.form["expiration"]
-
     expiration_time = isoparse(expiration_str)
 
-    doc_ref = db.collection("documents").document(file_id)
-    doc_ref.set({"file": file, "salt": salt, "iv": iv, "expiration": expiration_time.isoformat()})
-    # doc_ref.set({"file": file, "salt": salt, "iv": iv})
+    short_code = generate_short_code()
 
-    share_url = f"http://127.0.0.1:5000/view/{file_id}"
+    doc_ref = db.collection("documents").document(file_id)
+    doc_ref.set({
+        "file": file,
+        "salt": salt,
+        "iv": iv,
+        "expiration": expiration_time.isoformat(),
+        "short_code": short_code
+    })
+
+    # Save short code -> file_id mapping separately (optional for lookup speed)
+    db.collection("shortlinks").document(short_code).set({
+        "file_id": file_id
+    })
+
+    share_url = f"http://127.0.0.1:5000/s/{short_code}"
     return jsonify({"message": "File uploaded & encrypted!", "share_url": share_url})
 
 @app.route("/send-email", methods=["POST"])
@@ -141,7 +157,14 @@ def view_pdf(file_id):
     return render_template("viewer.html", file_id=file_id), 200
 
 
-
+@app.route("/s/<short_code>")
+def redirect_short_url(short_code):
+    short_doc = db.collection("shortlinks").document(short_code).get()
+    if short_doc.exists:
+        file_id = short_doc.to_dict()["file_id"]
+        return redirect(url_for("view_pdf", file_id=file_id))
+    else:
+        return "Invalid or expired link", 404
 
 
 if __name__ == '__main__':
