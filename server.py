@@ -78,14 +78,20 @@ def upload_file():
     share_url = f"http://127.0.0.1:5000/s/{short_code}"
     return jsonify({"message": "File uploaded & encrypted!", "share_url": share_url})
 
-@app.route("/send-email", methods=["POST"])
+
+# TODO: add expiration date to email 
+@app.route("/send-email", methods=["POST"]) 
 def send_email():
+    # print(data)
     data = request.get_json()
+    print(data)
     recipient_email = data.get("email")
     share_url = data.get("share_url")
+    expiration_time = data.get("exp_time")
+    formatted_exp_time = format_exp_time(expiration_time)
 
     if not recipient_email or not share_url:
-        return jsonify({"error": "Missing recipient email or share URL"}), 400
+        return jsonify({"error": "Missing recipient email or share URL or expiration time"}), 400
 
     try:
         sg = sendgrid.SendGridAPIClient(api_key=os.environ.get("SENDGRID_API_KEY"))
@@ -94,7 +100,7 @@ def send_email():
         subject = "You've received a secure file via Expirer"
         content = Content(
             "text/plain",
-            f"Hello,\n\nYou've been sent a secure file through Expirer. Click the link below to view it:\n\n{share_url}\n\nPlease note: This link will expire after the set time."
+            f"Hello,\n\nYou've been sent a secure file through Expirer. Click the link below to view it:\n\n{share_url}\n\nPlease note: This link will expire at:\n\n{formatted_exp_time}."
         )
 
         mail = Mail(from_email, to_email, subject, content)
@@ -112,7 +118,19 @@ def send_email():
             return jsonify({"error": "Failed to send email."}), 500
     except Exception as e:
         return jsonify({"error": str(e)}), 500
+    
+    
+def format_exp_time(exp_time_str):
+    try:
+        expiration_dt = isoparse(exp_time_str)
+        # Convert to local timezone if needed
+        local_time = expiration_dt.astimezone() 
+        return local_time.strftime("%B %d, %Y at %I:%M %p %Z") 
+    except Exception as e:
+        print(f"Error formatting expiration time: {e}")
+        return exp_time_str  # fallback
 
+ 
 
 @app.route("/download/<file_id>", methods=["GET"])
 def download_file(file_id):
@@ -141,7 +159,7 @@ def is_file_expired(expiration_str):
         print(f"Error parsing expiration time: {e}")
         return False
 
-
+#add expiration time
 @app.route("/view/<file_id>", methods=['GET'])
 def view_pdf(file_id):
     doc_ref = db.collection("documents").document(file_id)

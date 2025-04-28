@@ -72,7 +72,9 @@
             },
             body: JSON.stringify({
                 email: email,
-                share_url: shareUrl
+                share_url: shareUrl,
+                exp_time: expirationDatetime.toISOString() 
+                // CHANGE HERE
             })
         });
 
