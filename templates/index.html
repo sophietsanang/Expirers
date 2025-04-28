@@ -16,7 +16,7 @@
   </head>
 
   <script>
-  async function encryptAndUpload() {
+  async function encryptAndUpload(sendEmail) {
       let fileInput = document.getElementById("fileInput").files[0];
       if (!fileInput) {
           alert("Select a file first!");
@@ -80,13 +80,19 @@
 
         const emailResult = await emailResponse.json();
 
-        if (emailResponse.ok) {
+        if (sendEmail){
+          if (emailResponse.ok) {
             document.getElementById("uploadMessage").innerHTML =
                 `✅ File uploaded and email sent!<br>`;
+          } else {
+              document.getElementById("uploadMessage").innerHTML =
+                  `⚠️ File uploaded but failed to send email: ${emailResult.error}<br> Link: <a href="${shareUrl}">${shareUrl}</a>`;
+          }
         } else {
-            document.getElementById("uploadMessage").innerHTML =
-                `⚠️ File uploaded but failed to send email: ${emailResult.error}<br> Link: <a href="${shareUrl}">${shareUrl}</a>`;
+          document.getElementById("uploadMessage").innerHTML =
+                  `✅ Link: <a href="${shareUrl}">${shareUrl}</a>`;
         }
+       
 
     } catch (err) {
         console.error("Upload or email error:", err);
@@ -196,7 +202,9 @@
           </div>
 
           <button id="sendBtn" class="primary-btn"
-            onclick="encryptAndUpload()">Send File</button>
+            onclick="encryptAndUpload(true)">Send File</button>
+          <button id="generateLink" class="primary-btn" style="margin-left: 20px"
+            onclick="encryptAndUpload(false)">Generate Link</button>
           <p id="uploadMessage"></p>
         </section>
 
