@@ -142,6 +142,8 @@ def download_file(file_id):
 
     data = doc.to_dict()
     if is_file_expired(data["expiration"]):
+        #deletes expired files
+        delete_file(doc_ref, data)
         return jsonify({"error": "File link has expired"}), 403
 
     return {
@@ -159,6 +161,22 @@ def is_file_expired(expiration_str):
         print(f"Error parsing expiration time: {e}")
         return False
 
+ #Deletes files from database    
+def delete_file(doc_ref, data):
+    try:
+        # Delete the file document from Firestore
+        doc_ref.delete()
+        print(f"File {doc_ref.id} deleted from Firestore")
+
+        # If the file has a short_code, delete the corresponding shortlink
+        if "short_code" in data:
+            db.collection("shortlinks").document(data["short_code"]).delete()
+            print(f"Shortlink for {data['short_code']} deleted from Firestore")
+
+    except Exception as e:
+        print(f"Error deleting file or shortlink: {e}")
+
+
 #add expiration time
 @app.route("/view/<file_id>", methods=['GET'])
 def view_pdf(file_id):
@@ -170,6 +188,8 @@ def view_pdf(file_id):
 
     data = doc.to_dict()
     if is_file_expired(data["expiration"]):
+        #deletes the file from database
+        delete_file(doc_ref, data) 
         return render_template("expired.html"), 403
 
     return render_template("viewer.html", file_id=file_id), 200
