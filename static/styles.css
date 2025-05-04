@@ -1,296 +1,376 @@
-
 :root {
-    --primary-color: #ff595e;
-    --secondary-color: #ff3b40;
-    --light-bg: #fafafa;
-    --card-bg: #ffffff;
-    --text-color: #333;
-    --input-border: #ccc;
-    --input-focus: var(--primary-color);
-  }
-  
-  /* Global Styles */
-  body {
-    font-family: 'Poppins', sans-serif;
-    background: var(--light-bg);
-    margin: 0;
-    padding: 0;
-    color: var(--text-color);
-  }
-  
-  .container {
-    max-width: 1100px;
-    margin: 0 auto;
-    padding: 2rem;
-  }
-  
-  /* Navigation Styles */
-  nav {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 1rem 2rem;
-    background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
-    color: white;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  }
-  
-  nav .logo {
-    font-size: 1.8rem;
-    font-weight: 600;
-  }
-  
-  nav ul {
-    list-style: none;
-    display: flex;
-    gap: 20px;
-    padding: 0;
-    margin: 0;
-  }
-  
-  nav ul li a {
-    color: white;
-    text-decoration: none;
-    font-weight: 600;
-    transition: color 0.3s;
-  }
-  
-  nav ul li a:hover {
-    color: #ffe3e6;
-  }
-  
-  /* Main Content Styles */
-  main {
-    background: var(--card-bg);
-    border-radius: 12px;
-    padding: 2rem;
-    margin-top: 2rem;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
-    text-align: center;
-  }
-  
-  h1 {
-    margin-bottom: 1rem;
-  }
-  
-  /* Upload Box */
-  .upload-box {
-    border: 2px dashed var(--primary-color);
-    padding: 25px;
-    margin: 30px auto;
-    border-radius: 12px;
-    cursor: pointer;
-    background: #fff0f1;
-    transition: background 0.3s, border-color 0.3s, transform 0.3s;
-    width: 80%;
-    position: relative;
-  }
-  
-  .upload-box:hover {
-    transform: scale(1.02);
-  }
-  
-  .upload-box.hover {
-    background: #ffe3e6;
-    border-color: var(--secondary-color);
-  }
-  
-  .upload-box input[type="file"] {
-    opacity: 0;
-    width: 100%;
-    height: 100%;
-    position: absolute;
-    left: 0;
-    top: 0;
-    cursor: pointer;
-  }
-  
-  .upload-box label {
-    pointer-events: none;
-    font-weight: 500;
-    font-size: 1.1rem;
-    color: #555;
-  }
-  
-  /* Form Groups */
-  .form-group {
-    margin: 30px auto;
-    text-align: left;
-    width: 85%;
-  }
-  
-  label {
-    font-weight: 600;
-    display: block;
-    margin-bottom: 10px;
-    font-size: 1.1rem;
-  }
-  
-  input {
-    padding: 14px;
-    width: 100%;
-    border-radius: 12px;
-    border: 1px solid var(--input-border);
-    font-size: 1rem;
-    background: #fff;
-    transition: border 0.3s, box-shadow 0.3s;
-  }
-  
-  input:focus {
-    border-color: var(--input-focus);
-    outline: none;
-    box-shadow: 0 0 8px rgba(255,89,94,0.3);
-  }
-  
-  /* Button */
-  button {
-    background: var(--primary-color);
-    color: white;
-    padding: 14px 24px;
-    border: none;
-    border-radius: 25px;
-    cursor: pointer;
-    font-size: 1rem;
-    transition: background 0.3s, transform 0.3s;
-    margin-top: 20px;
-  }
-  
-  button:hover {
-    background: var(--secondary-color);
-    transform: translateY(-2px);
-  }
-  
-  
-  .hidden {
-    display: none;
-  }
-  
+  --primary-color: #ff595e;
+  --secondary-color: #ff3b40;
+  --light-bg: #fafafa;
+  --card-bg: #ffffff;
+  --text-color: #333;
+  --input-border: #ccc;
+  --input-focus: var(--primary-color);
+}
 
-  .steps, .faq-container {
-    text-align: left;
-    margin: 0 auto;
-    padding: 0;
-    max-width: 600px;
+/* Global Styles */
+body {
+  font-family: 'Poppins', sans-serif;
+  background: var(--light-bg);
+  margin: 0;
+  padding: 0;
+  color: var(--text-color);
+}
+
+.container {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 2rem;
+}
+
+/* Navigation Styles */
+nav {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem 2rem;
+  background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
+  color: white;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+nav .logo {
+  font-size: 1.8rem;
+  font-weight: 600;
+}
+
+nav ul {
+  list-style: none;
+  display: flex;
+  gap: 20px;
+  padding: 0;
+  margin: 0;
+}
+
+nav ul li a {
+  color: white;
+  text-decoration: none;
+  font-weight: 600;
+  transition: color 0.3s;
+}
+
+nav ul li a:hover {
+  color: #ffe3e6;
+}
+
+/* Main Content Styles */
+main {
+  background: var(--card-bg);
+  border-radius: 12px;
+  padding: 2rem;
+  margin-top: 2rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  text-align: center;
+}
+
+h1 {
+  margin-bottom: 1rem;
+  font-size: 1.5rem;
+
+}
+
+h2 {
+  margin-bottom: 1rem;
+  font-size: 1rem;
+}
+
+/* Upload Box */
+.upload-box {
+  border: 2px dashed var(--primary-color);
+  padding: 25px;
+  margin: 30px auto;
+  border-radius: 12px;
+  cursor: pointer;
+  background: #fff0f1;
+  transition: background 0.3s, border-color 0.3s, transform 0.3s;
+  width: 80%;
+  position: relative;
+}
+
+.upload-box:hover {
+  transform: scale(1.02);
+}
+
+.upload-box.hover {
+  background: #ffe3e6;
+  border-color: var(--secondary-color);
+}
+
+.upload-box input[type="file"] {
+  opacity: 0;
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  left: 0;
+  top: 0;
+  cursor: pointer;
+}
+
+.upload-box label {
+  pointer-events: none;
+  font-weight: 500;
+  font-size: 1.1rem;
+  color: #555;
+}
+
+/* Form Groups */
+.form-group {
+  margin: 30px auto;
+  text-align: left;
+  width: 85%;
+}
+
+label {
+  font-weight: 600;
+  display: block;
+  margin-bottom: 10px;
+  font-size: 1.1rem;
+}
+
+input {
+  padding: 14px;
+  width: 100%;
+  border-radius: 12px;
+  border: 1px solid var(--input-border);
+  font-size: 1rem;
+  background: #fff;
+  transition: border 0.3s, box-shadow 0.3s;
+}
+
+input:focus {
+  border-color: var(--input-focus);
+  outline: none;
+  box-shadow: 0 0 8px rgba(255, 89, 94, 0.3);
+}
+
+/* Button */
+button {
+  background: var(--primary-color);
+  color: white;
+  padding: 14px 24px;
+  border: none;
+  border-radius: 25px;
+  cursor: pointer;
+  font-size: 1rem;
+  transition: background 0.3s, transform 0.3s;
+  margin-top: 20px;
+}
+
+button:hover {
+  background: var(--secondary-color);
+  transform: translateY(-2px);
+}
+
+
+.hidden {
+  display: none;
+}
+
+
+/* ───── FAQ: switch to two‑column grid ───────────────────────────── */
+.faq-container {
+  /* removed: max-width: 600px; */
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 24px;
+  margin: 0 auto;
+  padding: 0;
+  max-width: 1000px;
+  /* keeps the grid from stretching too wide */
+}
+
+/* grid gap now handles spacing */
+.faq-item {
+  margin: 0;
+}
+
+/* (optional) collapse to one column on very small screens */
+@media (max-width: 480px) {
+  .faq-container {
+    grid-template-columns: 1fr;
   }
-  
-  .steps li {
-    margin: 10px 0;
-    padding: 10px;
-    background: #f7f7f7;
-    border-radius: 8px;
-    list-style: decimal inside;
-  }
-  
-  .faq-item {
-    margin: 20px 0;
-    padding: 15px;
-    background: #f7f7f7;
-    border-radius: 8px;
-    border-left: 4px solid var(--primary-color);
-  }
-  
-  .faq-item h3 {
-    margin-top: 0;
-  }
-  
+}
+
+/* ───── How‑to‑Use: keep vertical, add pink stripe ──────────────── */
+.steps {
+  display: block;
+  /* keep vertical flow */
+  max-width: 780px;
+  /* NEW: cap width so the cards aren’t stretched */
+  margin: 0 auto;
+  /* NEW: center inside the main column */
+}
+
+/* First‑level list items (1–5) keep the stripe */
+.steps>li {
+  margin: 20px 0;
+  padding: 10px 16px 10px 18px;
+  background: #f7f7f7;
+  border-radius: 8px;
+  list-style: decimal inside;
+  border-left: 4px solid var(--primary-color);
+  /* pink stripe */
+}
+
+/* Nested bullets inside Step 2 (or others) remove the stripe */
+.steps li li {
+  border-left: none;
+  /* no stripe */
+  list-style: disc outside;
+  /* ordinary bullet */
+  padding-left: 0;
+}
+
+
+.faq-item {
+  margin: 20px 0;
+  padding: 15px;
+  background: #f7f7f7;
+  border-radius: 8px;
+  border-left: 4px solid var(--primary-color);
+}
+
+.faq-item h3 {
+  margin-top: 0;
+}
+
 
 input::placeholder {
-    font-family: 'Poppins', sans-serif; 
-    color: #aaa; 
-    font-size: 1rem; 
-  }
-  
-  input:-ms-input-placeholder {
-    font-family: 'Poppins', sans-serif;
-  }
-  
- 
-  input::-webkit-input-placeholder {
-    font-family: 'Poppins', sans-serif;
-  }
+  font-family: 'Poppins', sans-serif;
+  color: #aaa;
+  font-size: 1rem;
+}
 
-  button.primary-btn {
-    font-family: 'Poppins', sans-serif;
-    
-  }
-
-  .secondary-btn {
-    padding: 8px 16px;
-    margin-left: 10px;
-    background-color: #f0f0f0;
-    border: 1px solid #ccc;
-    cursor: pointer;
-    font-size: 14px;
-  }
-  
-  .secondary-btn:hover {
-    background-color: #e0e0e0;
-  }
-
-  .valid-email {
-    background-color: #ff595e;
-    transition: background-color 0.3s ease;
-  }
-
-  #checkBreachBtn {
-    background-color: #e0e0e0; 
-    color: #555; 
-    border: none;
-    padding: 10px 16px;
-    font-weight: 600;
-    cursor: not-allowed;
-    opacity: 0.8;
-    transition: background-color 0.3s ease;
-  }
-  
-  #checkBreachBtn.valid-email {
-    background-color: #ff595e;
-    color: #333;
-    cursor: pointer;
-    opacity: 1;
-  }
+input:-ms-input-placeholder {
+  font-family: 'Poppins', sans-serif;
+}
 
 
-  .tooltip-wrapper {
-    position: relative;
-    display: inline-block;
-  }
-  
-  .tooltip-icon {
-    cursor: pointer;
-    font-size: 0.9rem;
-    color: #888;
-  }
-  
-  .tooltip-text {
-    visibility: hidden;
-    width: 600px; /* Increase width here */
-    background-color: #333;
-    color: #fff;
-    text-align: left;
-    border-radius: 6px;
-    padding: 10px 14px;
-    position: absolute;
-    z-index: 1;
-  
-    top: 50%; 
-    left: 120%; 
-    transform: translateY(-50%); 
-    
-    opacity: 0;
-    transition: opacity 0.2s;
-    font-size: 0.9rem;
-    line-height: 1.4;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.25);
-  }
-  
-  .tooltip-wrapper:hover .tooltip-text {
-    visibility: visible;
-    opacity: 1;
-  }
+input::-webkit-input-placeholder {
+  font-family: 'Poppins', sans-serif;
+}
 
-  .required-indicator {
-    color: red;
-    font-size: 0.85em;
-    margin-left: 4px;
-  }
+button.primary-btn {
+  font-family: 'Poppins', sans-serif;
+
+}
+
+.secondary-btn {
+  padding: 8px 16px;
+  margin-left: 10px;
+  background-color: #f0f0f0;
+  border: 1px solid #ccc;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+.secondary-btn:hover {
+  background-color: #e0e0e0;
+}
+
+.valid-email {
+  background-color: #ff595e;
+  transition: background-color 0.3s ease;
+}
+
+#checkBreachBtn {
+  background-color: #e0e0e0;
+  color: #555;
+  border: none;
+  padding: 10px 16px;
+  font-weight: 600;
+  cursor: not-allowed;
+  opacity: 0.8;
+  transition: background-color 0.3s ease;
+}
+
+#checkBreachBtn.valid-email {
+  background-color: #ff595e;
+  color: #333;
+  cursor: pointer;
+  opacity: 1;
+}
+
+
+.tooltip-wrapper {
+  position: relative;
+  display: inline-block;
+}
+
+.tooltip-icon {
+  cursor: pointer;
+  font-size: 0.9rem;
+  color: #888;
+}
+
+.tooltip-text {
+  visibility: hidden;
+  width: 600px;
+  /* Increase width here */
+  background-color: #333;
+  color: #fff;
+  text-align: left;
+  border-radius: 6px;
+  padding: 10px 14px;
+  position: absolute;
+  z-index: 1;
+
+  top: 50%;
+  left: 120%;
+  transform: translateY(-50%);
+
+  opacity: 0;
+  transition: opacity 0.2s;
+  font-size: 0.9rem;
+  line-height: 1.4;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.25);
+}
+
+.tooltip-wrapper:hover .tooltip-text {
+  visibility: visible;
+  opacity: 1;
+}
+
+.required-indicator {
+  color: red;
+  font-size: 0.85em;
+  margin-left: 4px;
+}
+
+/* ── Small helpers for the updated How‑to‑Use section ───────────────────── */
+
+
+.emoji {
+  font-size: 1.1rem;
+  line-height: 1;
+}
+
+.expiry‑presets {
+  margin-top: 8px;
+  display: flex;
+  gap: .5rem;
+  align-items: center;
+}
+
+.expiry‑presets span {
+  font-size: .9rem;
+  color: #555;
+  padding-top: 15px;
+}
+
+.preset-btn {
+  padding: 4px 10px;
+  font: inherit;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.preset-btn:hover {
+  background: #f3f3f3;
+}

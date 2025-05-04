@@ -48,12 +48,18 @@
         return;
     }
 
-// Combine date + time and convert to ISO 8601
+
       let expirationDatetime = new Date(`${dateInput}T${timeInput}`);
+
+    if (expirationDatetime <= new Date()) {
+      alert("Expiration must be in the future.");
+      return;
+    }
+
       formData.append("expiration", expirationDatetime.toISOString());
 
       try {
-        // Step 1: Upload encrypted file
+        
         const response = await fetch("/upload", { method: "POST", body: formData });
         const data = await response.json();
 
@@ -64,7 +70,7 @@
 
         const shareUrl = `${data.share_url}#${encodedKey}`;
 
-        // Step 2: Send email with the share URL
+     
         const emailResponse = await fetch("/send-email", {
             method: "POST",
             headers: {
@@ -74,7 +80,7 @@
                 email: email,
                 share_url: shareUrl,
                 exp_time: expirationDatetime.toISOString() 
-                // CHANGE HERE
+                
             })
         });
 
@@ -119,6 +125,13 @@
   }
 
   window.addEventListener("DOMContentLoaded", () => {
+
+    
+    const expDate = document.getElementById('expirationDate');
+    const today = new Date();
+    today.setMinutes(today.getMinutes() - today.getTimezoneOffset()); 
+    expDate.min = today.toISOString().split('T')[0];  
+
     const uploadBox = document.getElementById("uploadBox");
     const fileInput = document.getElementById("fileInput");
     const fileNameDisplay = document.getElementById("fileNameDisplay");
@@ -167,9 +180,9 @@
       <main>
         <section id="home" class="content active">
           <h1>Welcome to Expirer!</h1>
-          <p>Upload and share your PDFs securely with custom expiration
-            settings.</p>
-
+          <h2> Please read instructions in the "How to Use" tab carefully before using.</h2>
+         
+          <p>Expirer is a secure platform for sharing PDF files with an expiration date. Your files are encrypted in your browser before being uploaded, ensuring that only the intended recipient can access them.</p>
           <div class="upload-box" id="uploadBox">
             <input type="file" id="fileInput" accept="application/pdf">
             <label for="fileInput">Drag & drop your PDF or click to
@@ -197,8 +210,16 @@
 
           <div class="form-group">
             <label for="expiration">Set Expiration <span class="required-indicator">*</span> </label>
-            <input type="date" id="expirationDate">
-            <input type="time" id="expirationTime">
+            <input type="date" id="expirationDate" placeholder="YYYY‑MM‑DD">
+            <input type="time" id="expirationTime" placeholder="HH:MM" step="60">
+            <!-- Quick‑select expiry presets -->
+    <div class="expiry‑presets">
+      <span>Quick presets:</span>
+      <button type="button" class="preset-btn" data-preset="24h">+ 24 hr</button>
+      <button type="button" class="preset-btn" data-preset="eod">Today, 23:59</button>
+      <button type="button" class="preset-btn" data-preset="1w">+ 1 week</button>
+    </div>
+
           </div>
 
           <button id="sendBtn" class="primary-btn"
@@ -208,32 +229,104 @@
           <p id="uploadMessage"></p>
         </section>
 
-        <section id="how-to-use" class="content hidden">
-          <h1>How to Use Expirer</h1>
-          <ol class="steps">
-            <li>Upload your PDF using the file upload box.</li>
-            <li>Enter the recipient’s email.</li>
-            <li>Set an expiration date and time.</li>
-            <li>Click <em>Send File</em> to share securely.</li>
-            <li>Copy the generated link and share it.</li>
-          </ol>
-        </section>
+        <!-- HOW‑TO‑USE – updated -->
+<section id="how-to-use" class="content hidden" aria-labelledby="htu‑title">
+  <h1 id="htu‑title">How to Use Expirer</h1>
 
-        <section id="faq" class="content hidden">
-          <h1>Frequently Asked Questions</h1>
-          <div class="faq-container">
-            <div class="faq-item">
-              <h3>What is Expirer?</h3>
-              <p>Expirer is a platform for uploading and sharing PDFs with
-                expiration settings.</p>
-            </div>
-            <div class="faq-item">
-              <h3>How long will my file be available?</h3>
-              <p>Your file will be accessible until the expiration date you
-                set.</p>
-            </div>
-          </div>
-        </section>
+
+  <ol class="steps">
+    <li>
+      <strong>Pick your PDF.</strong><br>
+      Drag and drop or click the upload box. 
+    </li>
+
+    <li>
+      <strong>Enter the recipient’s email.</strong><br>
+      We run a quick check if the email has been in any breaches. 
+      <ul>
+        
+     
+            <small>A higher “breaches found” number means the inbox has shown up
+            in more public leaks (read more about this from the Info icon next to the "Recipient email" input).</small>
+      </ul>
+    </li>
+
+    <li>
+      <strong>Set an expiration date &amp; time.</strong><br>
+      Use the presets avaiblable or pick a date and time in the future. 
+    </li>
+
+    <li>
+      <strong>Click <em>Send File</em> or <em>Generate Link</em>.</strong><br>
+      Your browser derives a key, encrypts the PDF,
+      uploads the file, and returns a unique URL that embeds
+      the decryption key. You can share this link by copy/paste or share the file directly through email. 
+    </li>
+
+  
+  </ol>
+</section>
+
+
+<section id="faq" class="content hidden" aria-labelledby="faq-title">
+  <h1 id="faq-title">Frequently Asked Questions</h1>
+  <div class="faq-container">
+    <!-- General -->
+    <div class="faq-item">
+      <h3>What is Expirer?</h3>
+      <p>Expirer is a web app for securely sharing PDF files that self‑delete after a date you choose. The file is encrypted after upload, so only someone with the special link can decrypt it.</p>
+    </div>
+
+    <!-- Availability -->
+    <div class="faq-item">
+      <h3>How long will my file be available?</h3>
+      <p>Your PDF remains accessible until the expiration date and time you selected. After that moment both the ciphertext and its metadata are permanently erased from our servers.</p>
+    </div>
+
+  
+
+    <div class="faq-item">
+      <h3>Who can open the link?</h3>
+      <p>Anyone who has the full link can decrypt the file. For maximum security, send the link through an end‑to‑end encrypted channel and avoid posting it publicly.</p>
+    </div>
+
+    <!-- Managing uploads -->
+    <div class="faq-item">
+      <h3>Can I delete a file before its expiration?</h3>
+      <p>No. The confirmation message you see after generating a link or sending the file is the final message and cannot be reversed.</p>
+    </div>
+
+    <div class="faq-item">
+      <h3>Can I extend the expiration date later?</h3>
+      <p>No. If you need a longer window, re‑upload the PDF with a new expiration.</p>
+    </div>
+
+    <!-- File limitations -->
+    <div class="faq-item">
+      <h3>Why can I only upload PDFs?</h3>
+      <p>PDFs are self‑contained, cross‑platform, and commonly used for sensitive documents. Restricting the format simplifies virus scanning and ensures consistent display for recipients.</p>
+    </div>
+
+    <div class="faq-item">
+      <h3>Is there a file‑size limit?</h3>
+      <p>No. There may be slow buffering times for uploading a file beyond 50MB.</p>
+    </div>
+
+
+    <!-- Email + privacy -->
+    <div class="faq-item">
+      <h3>Why do you need the recipient’s email?</h3>
+      <p>We send the share link automatically and run an optional breach check to help you gauge how long the link should live. We never sell or reuse email addresses.</p>
+    </div>
+
+    <div class="faq-item">
+      <h3>I didn’t receive the email—what should I do?</h3>
+      <p>First, look in the spam folder. If it’s missing, the sender can copy the link manually from their upload confirmation and share it through another channel.</p>
+    </div>
+
+    
+  </div>
+</section>
       </main>
     </div>
 
