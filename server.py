@@ -149,7 +149,8 @@ def download_file(file_id):
     return {
         "encrypted_data": data["file"].hex(),
         "iv": data["iv"].hex(),
-        "salt": data["salt"].hex()
+        "salt": data["salt"].hex(),
+        "expiration": data["expiration"]
     }
 
 # Checks the file expiration date and time
@@ -177,7 +178,7 @@ def delete_file(doc_ref, data):
         print(f"Error deleting file or shortlink: {e}")
 
 
-#add expiration time
+#Displays PDF
 @app.route("/view/<file_id>", methods=['GET'])
 def view_pdf(file_id):
     doc_ref = db.collection("documents").document(file_id)
