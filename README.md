@@ -30,7 +30,7 @@ pip install -r requirements.txt
 ```
 The `requirements.txt` file lists all third‑party packages, including `Flask`, `firebase‑admin`, `sendgrid`, `python‑dotenv`, `python‑dateutil`, and `requests`.
 
-### 4 • Run the application
+### 4  Run the application
 ```bash
 python server.py
 ```
