@@ -1,19 +1,19 @@
 # Expirers
+### Group Members: Cianna, Zara, Darien, Sophie 
 
 A secure PDF‑sharing and automatic‑expiry platform built with **Flask** and **Firebase**.
-Group Members: Cianna, Zara, Darien, Sophie 
 
 ---
 
 ## Getting Started
 
-### 1 • Clone the repository
+### 1  Clone the repository
 ```bash
 git clone https://github.com/sophietsanang/Expirers.git
 cd Expirers
 ```
 
-### 2 • Install prerequisites
+### 2  Install prerequisites
 * **Python 3.8** or later
 * **pip** (bundled with Python)
 
@@ -24,7 +24,7 @@ cd Expirers
 > # .\venv\Scripts\activate   # Windows PowerShell
 > ```
 
-### 3 • Install dependencies
+### 3  Install dependencies
 ```bash
 pip install -r requirements.txt
 ```
